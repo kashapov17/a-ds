@@ -31,11 +31,10 @@ void removeAX(T &arr, float &a) {
 }
 
 template <class T>
-int32_t average3(T &arr)
+double average3(T &arr)
 {
     const int n = 3;
     int32_t max3[n];
-    int32_t prev_max=0;
     for (int i=0; i < n; i++)
     {
         max3[i] = std::numeric_limits<int32_t>::min();
@@ -43,7 +42,7 @@ int32_t average3(T &arr)
         {
             if (i != 0)
             {
-                if (arr[j] >= prev_max)
+                if (arr[j] >= max3[i-1])
                 {
                     continue;
                 }
@@ -53,19 +52,19 @@ int32_t average3(T &arr)
                 max3[i] = arr[j];
             }
         }
-        prev_max = max3[i];
     }
-    int64_t avg=0;
+    int64_t sum=0;
     for (int32_t &i : max3)
     {
-         avg += i;
+         sum += i;
     }
-    return static_cast<int32_t>(avg/3);
+    return static_cast<double>(sum/3.0);
 }
 
 void fill(array &arr, list &list, uint64_t size)
 {
-    std::mt19937 generator(time(0));
+    //std::mt19937 generator(time(nullptr));
+    std::mt19937 generator(0);
     std::uniform_int_distribution<int32_t> distribution( // (-2^31, 2^31 - 1)
             std::numeric_limits<int32_t>::min(),
             std::numeric_limits<int32_t>::max());
@@ -73,7 +72,7 @@ void fill(array &arr, list &list, uint64_t size)
     {
         int64_t num = distribution(generator);
         arr[i] = num;
-        list.push_back(num);=
+        list.push_back(num);
     }
 }
 

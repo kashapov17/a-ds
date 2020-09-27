@@ -7,6 +7,7 @@
 
 #ifndef WORK2_LIST_H
 #define WORK2_LIST_H
+
 namespace node
 {
     struct node
@@ -28,7 +29,6 @@ public:
     int32_t& operator[](uint64_t idx);
     bool isEmpty();
     std::string typeName();
-
 
 private:
     uint64_t _size;
