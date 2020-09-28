@@ -17,7 +17,7 @@ list::~list()
 {
     if(!_size)
     {
-        for (int i=0; i< _size; i++)
+        for (uint64_t i=0; i< _size; i++)
         {
             remove(i);
         }
@@ -26,7 +26,7 @@ list::~list()
 
 void list::remove(uint64_t idx)
 {
-    if (!_size) return;
+    if (!_size && (idx >= _size)) return;
     node::node* curr = inode(idx);
 
     if (curr->prev == nullptr)
@@ -61,7 +61,7 @@ void list::push_back(int32_t val)
     last = node;
 }
 
-uint32_t list::size() const
+uint64_t list::size() const
 {
     return _size;
 }
@@ -75,8 +75,8 @@ node::node* list::inode(uint64_t idx)
 {
     if(!_size) return nullptr;
     uint64_t from_end = _size-1 - idx;
-
     uint64_t distance = std::min(idx, from_end);
+
     node::node *it;
     bool toForward;
 
@@ -91,7 +91,7 @@ node::node* list::inode(uint64_t idx)
             it = first;
         }
 
-    for (int i=0; i < distance; i++)
+    for (uint64_t i=0; i < distance; i++)
     {
         if(toForward)
             it = it->next;
@@ -104,9 +104,4 @@ node::node* list::inode(uint64_t idx)
 bool list::isEmpty()
 {
     return !static_cast<bool>(size());
-}
-
-std::string list::typeName()
-{
-    return "list";
 }

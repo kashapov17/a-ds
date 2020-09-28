@@ -18,11 +18,11 @@ void print(T &arr)
 }
 
 template<typename T>
-void removeAX(T &arr, float &a) {
-    auto ax = a * average3(arr);
+void removeLessAX(T &arr, float &a) {
+    auto ax = a * averageMax3(arr);
     for (uint64_t i=0; i < arr.size(); i++)
     {
-        if (arr[i] < ax)
+        if ((double)arr[i] < ax)
         {
             arr.remove(i);
             i--;
@@ -31,7 +31,7 @@ void removeAX(T &arr, float &a) {
 }
 
 template <class T>
-double average3(T &arr)
+double averageMax3(T &arr)
 {
     const int n = 3;
     int32_t max3[n];
@@ -63,14 +63,14 @@ double average3(T &arr)
 
 void fill(array &arr, list &list, uint64_t size)
 {
-    //std::mt19937 generator(time(nullptr));
-    std::mt19937 generator(0);
-    std::uniform_int_distribution<int32_t> distribution( // (-2^31, 2^31 - 1)
+    std::mt19937 generator(time(nullptr));
+    //std::mt19937 generator(0);
+    std::uniform_int_distribution<int32_t> distribution( // [-2^31, 2^31 - 1]
             std::numeric_limits<int32_t>::min(),
             std::numeric_limits<int32_t>::max());
-    for (uint i = 0; i < size; i++)
+    for (uint64_t i = 0; i < size; i++)
     {
-        int64_t num = distribution(generator);
+        int32_t num = distribution(generator);
         arr[i] = num;
         list.push_back(num);
     }
@@ -79,7 +79,7 @@ void fill(array &arr, list &list, uint64_t size)
 int main()
 {
     float a=0;
-    std::cout << "A:= ";
+    std::cout << "A = ";
     std::cin >> a;
 
     uint64_t size=0;
@@ -94,19 +94,19 @@ int main()
     fill(array, list, size);
 
     time(&ts);
-    removeAX(array, a);
+    removeLessAX(array, a);
     time(&te);
     std::cout << "\n";
     std::cout << "Size of array: " << array.size() << "\n";
-    std::cout << "was deleted " << size - array.size() << " elements\n";
+    std::cout << size - array.size() << " elements " << "was deleted\n" ;
     std::cout << "computing time: " << te - ts << " seconds"<< "\n";
 
     time(&ts);
-    removeAX(list, a);
+    removeLessAX(list, a);
     time(&te);
     std::cout << "-------\n";
     std::cout << "Size of double linked list: " << list.size() << "\n";
-    std::cout << "was deleted " << size - list.size() << " elements\n";
+    std::cout << size - list.size() << " elements " << "was deleted\n" ;
     std::cout << "computing time: " << te - ts << " seconds" << std::endl;
 
     return 0;

@@ -25,10 +25,9 @@ public:
     ~list();
     void push_back(int32_t val);
     void remove(uint64_t idx);
-    uint32_t size() const;
+    uint64_t size() const;
     int32_t& operator[](uint64_t idx);
     bool isEmpty();
-    std::string typeName();
 
 private:
     uint64_t _size;

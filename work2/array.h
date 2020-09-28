@@ -13,10 +13,9 @@ public:
     explicit array(uint64_t &size);
     ~array();
     void remove(uint64_t idx);
-    const uint64_t size() const;
+    uint64_t size() const;
     int32_t& operator[](const uint64_t &idx);
     bool isEmpty();
-    std::string typeName();
 
 private:
     uint64_t _size;
