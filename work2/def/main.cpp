@@ -6,16 +6,16 @@
 
 double averageMax3(std::queue<int32_t> &q)
 {
-    const int n = 3;
+    const uint8_t n = 3;
     int32_t max3[n];
-    for (int i=0; i < n; i++)
+    for (uint8_t i=0; i < n; i++)
     {
-        auto b = q;
         max3[i] = std::numeric_limits<int32_t>::min();
-        for (uint64_t j=0; !b.empty(); j++)
+        for (uint64_t j=0; j < q.size(); j++)
         {
-            auto elem = b.front();
-            b.pop();
+            auto elem = q.front();
+            q.push(elem);
+            q.pop();
             if (i != 0)
             {
                 if (elem >= max3[i-1])
@@ -39,17 +39,18 @@ double averageMax3(std::queue<int32_t> &q)
 
 void removeLessAX(std::queue<int32_t> &q, float &a) {
     auto ax = a * averageMax3(q);
-    std::cout << ax << "\n";
-    std::queue<int32_t> b;
-    for (uint64_t i=0; !q.empty(); i++)
+    for (uint64_t i=0; i < q.size(); i++)
     {
-        if (q.front() >= ax)
+        auto elem = q.front();
+        if (elem < ax)
         {
-            b.push(q.front());
-        }
+            i--;
+        } else
+            {
+                q.push(elem);
+            }
         q.pop();
     }
-    b.swap(q);
 }
 
 void fill(std::queue<int32_t> &q, uint64_t size)
@@ -86,5 +87,6 @@ int main() {
     std::cout << size - q.size() << " elements " << "was deleted\n" ;
     std::cout << "computing time: " << std::chrono::duration_cast<
             std::chrono::milliseconds>(time_end - time_start).count() << " milliseconds"<< "\n";
+
     return 0;
 }
