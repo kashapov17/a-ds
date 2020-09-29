@@ -1,6 +1,9 @@
-//
-// Created by yaroslav on 18.09.2020.
-//
+/**
+ * @brief List implementation
+ * @file list.cpp
+ * @author Kashapov Yaroslav
+ * @date 2020
+*/
 
 #include "list.h"
 
@@ -46,7 +49,7 @@ void list::remove(uint64_t idx)
     _size--;
 }
 
-void list::push_back(int32_t val)
+void list::push_back(int32_t &val)
 {
     if (_size == std::numeric_limits<uint64_t>::max()) return;
     _size++;

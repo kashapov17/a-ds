@@ -1,6 +1,9 @@
-//
-// Created by yaroslav on 18.09.2020.
-//
+/**
+ * @brief small array implementation
+ * @file array.cpp
+ * @author Kashapov Yaroslav
+ * @date 2020
+*/
 
 #include "array.h"
 

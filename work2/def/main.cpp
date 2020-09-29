@@ -1,8 +1,23 @@
+/**
+ * @brief control task
+ * @file def/main.cpp
+ * @author Kashapov Yaroslav
+ * @date 2020
+*/
+
 #include <iostream>
 #include <queue>
 #include <limits>
 #include <random>
 #include <chrono>
+
+#define timer_start (std::chrono::high_resolution_clock::now())
+#if defined timer_start
+#define timer_elapsed(t) (std::chrono::duration_cast \
+                                <std::chrono::milliseconds> \
+                                (std::chrono::high_resolution_clock \
+                                        ::now() - t).count())
+#endif
 
 double averageMax3(std::queue<int32_t> &q)
 {
@@ -37,7 +52,8 @@ double averageMax3(std::queue<int32_t> &q)
     return static_cast<double>(sum/3.0);
 }
 
-void removeLessAX(std::queue<int32_t> &q, float &a) {
+void removeLessAX(std::queue<int32_t> &q, float &a)
+{
     auto ax = a * averageMax3(q);
     for (uint64_t i=0; i < q.size(); i++)
     {
@@ -66,8 +82,8 @@ void fill(std::queue<int32_t> &q, uint64_t size)
     }
 }
 
-int main() {
-
+int main()
+{
     float a=0;
     std::cout << "A = ";
     std::cin >> a;
@@ -79,14 +95,13 @@ int main() {
     std::queue<int32_t> q;
     fill(q, size);
 
-    auto time_start = std::chrono::high_resolution_clock::now();
+    auto timer = timer_start;
     removeLessAX(q, a);
-    auto time_end = std::chrono::high_resolution_clock::now();
+    auto elapsed = timer_elapsed(timer);
     std::cout << "\n";
     std::cout << "Size of array: " << q.size() << "\n";
     std::cout << size - q.size() << " elements " << "was deleted\n" ;
-    std::cout << "computing time: " << std::chrono::duration_cast<
-            std::chrono::milliseconds>(time_end - time_start).count() << " milliseconds"<< "\n";
+    std::cout << "computing time: " << elapsed << " milliseconds"<< "\n";
 
     return 0;
 }

@@ -1,6 +1,9 @@
-//
-// Created by yaroslav on 18.09.2020.
-//
+/**
+ * @brief header of "array" class
+ * @file array.h
+ * @author Kashapov Yaroslav
+ * @date 2020
+*/
 
 #include <cstdint>
 #include <string>

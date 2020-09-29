@@ -1,9 +1,24 @@
+/**
+ * @brief work2. Linear Data Structures
+ * @file main.cpp
+ * @author Kashapov Yaroslav
+ * @date 2020
+*/
+
 #include <iostream>
 #include <random>
-#include <ctime>
+#include <chrono>
 
 #include "list.h"
 #include "array.h"
+
+#define timer_start (std::chrono::high_resolution_clock::now())
+#if defined timer_start
+    #define timer_elapsed(t) (std::chrono::duration_cast \
+                                <std::chrono::milliseconds> \
+                                (std::chrono::high_resolution_clock \
+                                        ::now() - t).count())
+#endif
 
 template <class T>
 void print(T &arr)
@@ -61,7 +76,7 @@ double averageMax3(T &arr)
     return static_cast<double>(sum/3.0);
 }
 
-void fill(array &arr, list &list, uint64_t size)
+void fill(array &arr, list &list, uint64_t &size)
 {
     std::mt19937 generator(time(nullptr));
     //std::mt19937 generator(0);
@@ -89,25 +104,23 @@ int main()
     array array(size);
     list list;
 
-    time_t ts, te;
-
     fill(array, list, size);
 
-    time(&ts);
+    auto timer = timer_start;
     removeLessAX(array, a);
-    time(&te);
+    auto elapsed = timer_elapsed(timer);
     std::cout << "\n";
     std::cout << "Size of array: " << array.size() << "\n";
     std::cout << size - array.size() << " elements " << "was deleted\n" ;
-    std::cout << "computing time: " << te - ts << " seconds"<< "\n";
+    std::cout << "computing time: " << elapsed << " seconds"<< "\n";
 
-    time(&ts);
+    timer = timer_start;
     removeLessAX(list, a);
-    time(&te);
+    elapsed = timer_elapsed(timer);
     std::cout << "-------\n";
     std::cout << "Size of double linked list: " << list.size() << "\n";
     std::cout << size - list.size() << " elements " << "was deleted\n" ;
-    std::cout << "computing time: " << te - ts << " seconds" << std::endl;
+    std::cout << "computing time: " << elapsed << " seconds" << std::endl;
 
     return 0;
 }

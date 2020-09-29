@@ -1,6 +1,9 @@
-//
-// Created by yaroslav on 18.09.2020.
-//
+/**
+ * @brief header of "list" class
+ * @file list.h
+ * @author Kashapov Yaroslav
+ * @date 2020
+*/
 
 #include <cstdint>
 #include <string>
@@ -23,7 +26,7 @@ class list
 public:
     list();
     ~list();
-    void push_back(int32_t val);
+    void push_back(int32_t &val);
     void remove(uint64_t idx);
     uint64_t size() const;
     int32_t& operator[](uint64_t idx);
