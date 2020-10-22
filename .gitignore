@@ -1,1 +1,5 @@
-work[2]/cmake-build-debug/*
+*cmake-build-debug*
+*.idea
+*a.out
+
+
