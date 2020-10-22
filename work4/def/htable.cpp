@@ -1,5 +1,5 @@
 /**
- * @brief hash table with opening addressing and additive hash implementation
+ * @brief chain hash table with additive hashing implementation
  * @file htable.cpp
  * @author Kashapov Yaroslav
  * @date 2020
@@ -10,7 +10,7 @@
 
 htable::htable()
 {
-    table = new vec;
+    table = new std::vector<std::list<int>>;
     _size=0;
 }
 
@@ -24,39 +24,31 @@ void htable::add(int num)
 {
     int pos = hash(num);
     int need_to_add = pos+1;
-
     if (!table->empty())
     {
-        need_to_add-=int(table->size());
-        for (; pos < table->size(); pos++)
-        {
-            if (table->at(pos).empty)
-            {
-                need_to_add=0;
-                break;
-            }
-            need_to_add=1;
-        }
+        if (pos >= table->size())
+            need_to_add -= int(table->size());
+        else
+            need_to_add = 0;
     }
-
-    while(need_to_add--)
+    while (need_to_add--)
     {
-        auto *e = new entry;
-        e->empty=true;
+        auto *e = new std::list<int>;
         table->push_back(*e);
     }
-    table->at(pos) = {.empty=false, .value=num};
+    table->at(pos).push_front(num);
     _size++;
 }
 
 int htable::remove(const int num)
 {
-    entry *e = retrieve(num);
-    if (e)
+    std::list<int> *list = &table->at(hash(num));
+    auto it = retrieve(num);
+    if (list->end() != it && !table->empty())
     {
-        e->empty=true;
+        list->erase(it);
         trim();
-        return _size--;
+        return --_size;
     }
     return -1;
 }
@@ -88,26 +80,30 @@ inline int htable::hash(int num)
 
 int htable::print(std::ostream &ost)
 {
-    int i=0;
-    for (const auto &item : *table)
-        //if(!item.empty)
-            ost << (item.empty ? "*" : "") << "entry[" << i++ << "]: " << item.value << "\n";
-    return size();
+    for (int i=0; i < table->size(); i++)
+    {
+
+        ost << "[" << i << "]: ";
+        for (const auto &item : table->at(i)) {
+            ost << "<" << item << "> ";
+        }
+        ost << "\n";
+    }
+    return _size;
 }
 
-htable::entry *htable::retrieve(const int num)
+std::list<int>::iterator htable::retrieve(const int num)
 {
-    for (int i = hash(num); i < table->size(); i++)
-    {
-        if (table->at(i).value == num && !table->at(i).empty)
-            return &table->at(i);
-    }
-    return nullptr;
+    std::list<int> *list = &table->at(hash(num));
+    for(auto it=list->begin(); it!=list->end(); it++)
+        if (*it == num)
+            return it;
+    return list->end();
 }
 
 inline void htable::trim()
 {
-    while ((table->end()-1)->empty)
+    while ((table->end()-1)->empty())
     {
         table->erase(table->end()-1);
     }
@@ -131,10 +127,11 @@ void htable::clear()
 
 int htable::search(int num)
 {
-    for (int i = hash(num); i < table->size(); i++)
+    std::list<int> *list = &table->at(hash(num));
+    auto it = retrieve(num);
+    if (list->end() != it && !table->empty())
     {
-        if (table->at(i).value == num && !table->at(i).empty)
-            return table->at(i).value;
+        return num;
     }
-    return num-1;
+    return num+1;
 }

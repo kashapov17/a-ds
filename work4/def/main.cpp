@@ -1,5 +1,5 @@
 /**
- * @brief work4. Search algorithms
+ * @brief work4. control task
  * @file main.cpp
  * @author Kashapov Yaroslav
  * @date 2020
@@ -13,6 +13,7 @@ int main()
     std::ifstream in;
     htable h;
 
+    h.print(std::cout);
     char choose=0;
     int num;
     while (choose!='8')

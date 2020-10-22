@@ -8,13 +8,13 @@
 #ifndef WORK4_HTABLE_H
 #define WORK4_HTABLE_H
 
+#include <list>
 #include <vector>
 #include <fstream>
+#include <iterator>
 
 class htable {
-
 public:
-    struct entry {bool empty; int value;};
     htable();
     ~htable();
     int capacity() const;
@@ -25,15 +25,13 @@ public:
     void load_file(std::ifstream &, const std::string &);
     void clear();
     int search(int num);
-private:
 
+private:
     static int hash(int);
     void trim();
     int _size;
-    using vec=std::vector<entry>;
-    vec *table;
-    entry* retrieve(int);
-
+    std::vector<std::list<int>> *table;
+    std::list<int>::iterator retrieve(int);
 };
 
 #endif //WORK4_HTABLE_H
