@@ -1,5 +1,5 @@
 /**
- * @brief work2. control task
+ * @brief work3. control task
  * @file main.cpp
  * @author Kashapov Yaroslav
  * @date 2020
