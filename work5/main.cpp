@@ -3,7 +3,8 @@
 #include <random>
 #include <chrono>
 
-#define QSRAND 1
+#define QSRAND 0
+#define VRAND 0
 
 #define timer_start (std::chrono::high_resolution_clock::now())
 #ifdef timer_start
@@ -77,7 +78,7 @@ namespace quicksort
         return i - 1;
     }
 
-    uint chpivot(uint &l, uint &r) //O(1)
+    uint chpivot(uint &l, uint &r)
     {
         std::mt19937 generator(time(nullptr));
         std::uniform_int_distribution<uint> distribution(l,r);
@@ -85,16 +86,22 @@ namespace quicksort
     }
 
     template<typename T>
-    uint chpivot(std::vector<T> &v) // O(3n)
+    uint chpivot(std::vector<T> &v, uint &l, uint &r)
     {
-        auto max = std::max_element(v.begin(), v.end()); //O(n)
-        auto min = std::min_element(v.begin(), v.end()); //O(n)
-        T median = (*max - *min)/2 + *min;
-        uint pos=std::distance(v.begin(), min);
-        for (uint i=1; i < v.size(); i++) //O(n)
+        uint imin=l, imax = l;
+        for (int i=l; i <= r; i++)
+        {
+            if (v[imax] < v[i])
+                imax = i;
+            if (v[i] < v[imin])
+                imin = i;
+        }
+        T median = (v[imax] - v[imin])/2 + v[imin];
+        uint pos=imin;
+        for (uint i=1; i < v.size(); i++)
             if (v[i] > v[pos] && v[i] <= median)
                 pos = i;
-        return pos;
+        return pos; 
     }
 
     template<typename T>
@@ -103,9 +110,9 @@ namespace quicksort
         if (l >= r)
             return;
 #if(QSRAND==0)
-        uint i = chpivot(v);
+        uint i = chpivot(v, l, r); //O(n)
 #else
-        uint i = chpivot(l, r);
+        uint i = chpivot(l, r); //O(1)
 #endif
         std::swap(v[l], v[i]);
         uint j = qpart(v, l, r);
@@ -142,7 +149,7 @@ void fill(std::vector<T> &v, uint size)
     std::uniform_int_distribution<T> distribution(
             std::numeric_limits<T>::min(),
             std::numeric_limits<T>::max());
-    for (uint64_t i = 0; i < size; i++)
+    for (uint64_t i = size; i > 0; i--)
     {
         int32_t num = distribution(generator);
         v.push_back(num);
@@ -152,25 +159,31 @@ void fill(std::vector<T> &v, uint size)
 
 int main()
 {
-    //std::vector<int> v {-1, 7, 3, 210, -10, 1, 1, 2, 3, 10, 20, 2, 5, 6, 1, 0, 8, 4, 11, 12,7};
-    std::vector<int> v;
-    fill(v,50000);
-
+#if(VRAND==1)
+    //std::vector<int> v;
+    //fill(v,50000);
+#else
+    std::vector<int> v {-1, 7, 3, 210, -10, 1, 1, 2, 3, 10, 20, 2, 5, 6, 1, 0, 8, 4, 11, 12,7};
+    //std::vector<int> v {1, 2, 3, 4, 5};
+#endif
 
     std::cout << "\n<<insertion sort>>";
+    //auto timer = timer_start;
     print(instertionsort::insertionsort(v));
+    //auto elapsed = timer_elapsed(timer);
+    //std::cout << elapsed << std::endl;
 
     std::cout << "\n<<Shell sort>>";
+    //timer = timer_start;
     print(shellsort::shellsort(v));
+    //elapsed = timer_elapsed(timer);
+    //std::cout << elapsed << std::endl;
 
     std::cout << "\n<<selection sort>>";
     print(selectionsort::selectionsort(v));
 
     std::cout << "\n<<quick sort>>";
-    auto timer = timer_start;
     print(quicksort::qsort(v));
-    auto elapsed = timer_elapsed(timer);
-    std::cout << elapsed << std::endl;
 
     return 0;
 }
