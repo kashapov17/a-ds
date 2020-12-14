@@ -13,10 +13,11 @@ class bintree {
                 node *r;
             };
     node *root;
+    void destroy(node *&);
     static node *node_alloc(T &);
     void add(T &, node* &);
     node *remove(T &, node *&);
-    void removeLess(T &, node *&);
+    void removeLess(double &, node *&);
     node *search(T &, node *&);
     node *min(node *);
     node *max(node *);
@@ -29,7 +30,7 @@ public:
     ~bintree();
     void add(T);
     void print(std::ostream &ost);
-    void removeLess(T);
+    void removeLess(double);
     bool remove(T);
     bool search(T);
     T min();

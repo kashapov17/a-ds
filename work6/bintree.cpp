@@ -11,7 +11,8 @@ bintree<T>::bintree()
 template<typename T>
 bintree<T>::~bintree()
 {
-    delete root;
+    destroy(root);
+    //delete root;
     root = nullptr;
 }
 
@@ -83,13 +84,13 @@ inline typename bintree<T>::node* bintree<T>::node_alloc(T &val)
 }
 
 template<typename T>
-void bintree<T>::removeLess(T val)
+void bintree<T>::removeLess(double val)
 {
     removeLess(val, root);
 }
 
 template<typename T>
-void bintree<T>::removeLess(T &val, bintree::node *&n)
+void bintree<T>::removeLess(double &val, bintree::node *&n)
 {
     if (n == nullptr) return;
     if (n->val >= val)
@@ -161,6 +162,16 @@ void bintree<T>::print(const std::string& prefix, const node* n, bool isLeft, st
         print( prefix + (isLeft ? "│   " : "    "), n->l, true, ost);
         print( prefix + (isLeft ? "│   " : "    "), n->r, false, ost);
     }
+}
+
+template<typename T>
+void bintree<T>::destroy(node *&n)
+{
+    if (n == nullptr)
+        return;
+    destroy(n->l);
+    destroy(n->r);
+    delete n;
 }
 
 template class bintree<int8_t>;
