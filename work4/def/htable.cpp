@@ -20,7 +20,7 @@ htable::~htable()
     table = nullptr;
 }
 
-void htable::add(int num)
+void htable::add(const int num)
 {
     int pos = hash(num);
     int need_to_add = pos+1;
@@ -78,7 +78,7 @@ inline int htable::hash(int num)
     return r;
 }
 
-int htable::print(std::ostream &ost)
+int htable::print(std::ostream &ost) const
 {
     for (int i=0; i < table->size(); i++)
     {
@@ -92,7 +92,7 @@ int htable::print(std::ostream &ost)
     return _size;
 }
 
-std::list<int>::iterator htable::retrieve(const int num)
+std::list<int>::iterator htable::retrieve(const int num) const
 {
     std::list<int> *list = &table->at(hash(num));
     for(auto it=list->begin(); it!=list->end(); it++)
@@ -125,7 +125,7 @@ void htable::clear()
     _size=0;
 }
 
-int htable::search(int num)
+int htable::search(int num) const
 {
     std::list<int> *list = &table->at(hash(num));
     auto it = retrieve(num);

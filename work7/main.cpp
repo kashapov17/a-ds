@@ -73,7 +73,7 @@ private:
             v[curr].used = true;
             for(int j=0;j<size;j++)
             {
-                if (m[curr][j] == 1)
+                if (m[curr][j] == 1 && (v[j].d > v[curr].d + m[curr][j] or v[j].d == -1))
                 {
                     v[j].d = v[curr].d + m[curr][j];
                 }
@@ -100,6 +100,7 @@ int main()
     uint v;
     std::cout << "enter vertex: ";
     std::cin >> v;
+
     std::cout << "maximum shortest path from " << v  << ": "<< g.max_shortest(v) << "\n";
     return 0;
 }

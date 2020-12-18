@@ -3,7 +3,7 @@
 #include <random>
 #include <chrono>
 
-#define QSRAND 0
+#define QSRAND 1
 #define VRAND 0
 
 #define timer_start (std::chrono::high_resolution_clock::now())
@@ -75,7 +75,7 @@ namespace quicksort
             if (v[j] < p)
                 std::swap(v[j], v[i++]);
         std::swap(v[l], v[i - 1]);
-        return i - 1;
+        return i-1;
     }
 
     uint chpivot(uint &l, uint &r)
@@ -97,11 +97,10 @@ namespace quicksort
                 imin = i;
         }
         T median = (v[imax] - v[imin])/2 + v[imin];
-        uint pos=imin;
         for (uint i=1; i < v.size(); i++)
-            if (v[i] > v[pos] && v[i] <= median)
-                pos = i;
-        return pos; 
+            if (v[i] > v[imin] && v[i] <= median)
+                imin = i;
+        return imin;
     }
 
     template<typename T>
@@ -160,30 +159,30 @@ void fill(std::vector<T> &v, uint size)
 int main()
 {
 #if(VRAND==1)
-    //std::vector<int> v;
-    //fill(v,50000);
+    std::vector<int> v;
+    fill(v,10000);
 #else
     std::vector<int> v {-1, 7, 3, 210, -10, 1, 1, 2, 3, 10, 20, 2, 5, 6, 1, 0, 8, 4, 11, 12,7};
     //std::vector<int> v {1, 2, 3, 4, 5};
 #endif
 
-    std::cout << "\n<<insertion sort>>";
-    //auto timer = timer_start;
-    print(instertionsort::insertionsort(v));
-    //auto elapsed = timer_elapsed(timer);
-    //std::cout << elapsed << std::endl;
+    //std::cout << "\n<<insertion sort>>";
+    //print(instertionsort::insertionsort(v));
 
     std::cout << "\n<<Shell sort>>";
-    //timer = timer_start;
+    auto timer = timer_start;
     print(shellsort::shellsort(v));
-    //elapsed = timer_elapsed(timer);
-    //std::cout << elapsed << std::endl;
+    auto elapsed = timer_elapsed(timer);
+    std::cout << elapsed << std::endl;
 
-    std::cout << "\n<<selection sort>>";
-    print(selectionsort::selectionsort(v));
+    //std::cout << "\n<<selection sort>>";
+    //print(selectionsort::selectionsort(v));
 
     std::cout << "\n<<quick sort>>";
+    timer = timer_start;
     print(quicksort::qsort(v));
+    elapsed = timer_elapsed(timer);
+    std::cout << elapsed << std::endl;
 
     return 0;
 }
