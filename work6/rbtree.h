@@ -15,11 +15,11 @@ class rbtree {
         node *r;
     };
     node *root;
-
+    node *leaf;
     void destroy(node *&);
-    static node *node_alloc(T &, color = RED);
+    node *node_alloc(T &, color = RED);
     void fix_addition(node *&);
-    void fix_removing(node *&);
+    void fix_removing(node *);
     void leftRotate(node *&);
     void rightRotate(node *&);
     void color_flip(node *&);
@@ -27,6 +27,7 @@ class rbtree {
     node *remove(T &, node *&);
     void removeLess(T &, node *&);
     node *search(T &, node *&);
+    node *searchLess(T &, node *&);
     node *min(node *);
     node *max(node *);
     void print(const std::string& prefix, const node* n, bool isLeft, std::ostream &ost);

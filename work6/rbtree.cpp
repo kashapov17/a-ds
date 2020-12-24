@@ -5,14 +5,16 @@ template <typename T>
 rbtree<T>::rbtree()
 {
     size=0;
-    root = nullptr;
+    leaf = new node {0, BLACK, nullptr, nullptr, nullptr};
+    root = leaf;
 }
 
 template<typename T>
 rbtree<T>::~rbtree()
 {
     destroy(root);
-    root = nullptr;
+    delete leaf;
+    leaf = root = nullptr;
 }
 
 template <typename T>
@@ -26,7 +28,8 @@ template<typename T>
 typename rbtree<T>::node *rbtree<T>::add(T &val, rbtree::node *&n)
 {
     node *ret = nullptr;
-    if (n == nullptr)
+
+    if (n == leaf)
     {
         n = node_alloc(val);
         if (root == n)
@@ -34,6 +37,7 @@ typename rbtree<T>::node *rbtree<T>::add(T &val, rbtree::node *&n)
             n->c = color::BLACK;
             n->p = nullptr;
         }
+        size++;
         return n;
     }
     else if (val < n->val) {
@@ -57,7 +61,7 @@ void rbtree<T>::fix_addition(node *&n)
         if (parent == gparent->l) // father is left child
         {
             auto u = gparent->r;
-            if (u != nullptr && u->c == RED) {
+            if (u != leaf && u->c == RED) {
                 color_flip(gparent);
                 n = gparent;
             }
@@ -77,7 +81,7 @@ void rbtree<T>::fix_addition(node *&n)
         else // father is right child
             {
                 auto u = gparent->l;
-                if (u != nullptr && u->c == RED) {
+                if (u != leaf && u->c == RED) {
                     color_flip(gparent);
                     n = gparent;
                 }
@@ -133,15 +137,22 @@ typename rbtree<T>::node *rbtree<T>::remove(T &val, rbtree::node *&n)
     else
     {
         auto old_n = n;
-        if(n->l == nullptr)
+        node x {.val=n->val, .c=n->c, .p=n->p, .l=n->l, .r=n->r};
+        auto original_color = old_n->c;
+        if(n->l == leaf)
         {
             n = n->r;
+            if (n != leaf)
+                n->p = old_n->p;
             delete old_n;
             size--;
         }
-        else if (n->r == nullptr)
+        else if (n->r == leaf)
         {
             n = n->l;
+            if (n != leaf) {
+                n->p = old_n->p;
+            }
             delete old_n;
             size--;
         }
@@ -149,16 +160,87 @@ typename rbtree<T>::node *rbtree<T>::remove(T &val, rbtree::node *&n)
         {
             auto min_n = min(n->r);
             n->val = min_n->val;
-            remove(min_n->val, n->r);
+            return remove(min_n->val, n->r);
+        }
+        if (original_color == BLACK && size != 0) {
+            fix_removing(&x);
         }
     }
     return ret;
 }
 
 template<typename T>
-void rbtree<T>::fix_removing(rbtree::node *&)
+void rbtree<T>::fix_removing(rbtree::node *n)
 {
+    while (n != root and n->c == BLACK)
+    {
+        if (n->val < n->p->val)
+        {
+            auto s = n->p->r;
+            if (s->c == RED)
+            {
+                std::swap(s->c, n->p->c);
+                leftRotate(n->p);
+                s = n->p->r;
+            }
 
+            if (s->l->c == BLACK and s->r->c == BLACK)
+            {
+                s->c = RED;
+                n = n->p;
+            }
+            else
+                {
+                    if (s->r->c == BLACK)
+                    {
+                        s->l->c = BLACK;
+                        s->c = RED;
+                        rightRotate(s);
+                        s = n->p->r;
+                    }
+
+                    s->c = n->p->c;
+                    n->p->c = BLACK;
+                    s->r->c = BLACK;
+                    leftRotate(n->p);
+                    n = root;
+                }
+        }
+        else
+            {
+                auto s = n->p->l;
+                if (s->c == RED)
+                {
+                    s->c = BLACK;
+                    n->p->c = RED;
+                    rightRotate(n->p);
+                    s = n->p->l;
+                }
+
+                if (s->r->c == BLACK && s->l->c == BLACK)
+                {
+                    s->c = RED;
+                    n = n->p;
+                }
+                else
+                    {
+                        if (s->l->c == BLACK)
+                        {
+                            s->r->c = BLACK;
+                            s->c = RED;
+                            leftRotate(s);
+                            s = n->p->l;
+                        }
+
+                        s->c = n->p->c;
+                        n->p->c = BLACK;
+                        s->l->c = BLACK;
+                        rightRotate(n->p);
+                        n = root;
+                }
+            }
+        }
+    n->c = BLACK;
 }
 
 template<typename T>
@@ -167,14 +249,14 @@ inline typename rbtree<T>::node* rbtree<T>::node_alloc(T &val, color c)
     node *n = new node;
     n->c = c;
     n->val = val;
-    n->l = n->r = nullptr;
+    n->l = n->r = leaf;
     return n;
 }
 
 template<typename T>
 void rbtree<T>::destroy(node *&n)
 {
-    if (n == nullptr)
+    if (n == leaf)
         return;
     destroy(n->l);
     destroy(n->r);
@@ -190,15 +272,27 @@ void rbtree<T>::removeLess(T val)
 template<typename T>
 void rbtree<T>::removeLess(T &val, rbtree::node *&n)
 {
-    if (n == nullptr) return;
-    if (n->val >= val)
-        removeLess(val, n->l);
-    else
-    {
-        removeLess(val, n->l);
-        removeLess(val, n->r);
-        remove(n->val, n);
-    }
+    auto x = searchLess(val, root);
+    do
+        {
+            if(x == leaf)
+                continue;
+            remove(x->val, x);
+            x = searchLess(val, root);
+        }
+        while (x);
+}
+
+
+template<typename T>
+typename rbtree<T>::node *rbtree<T>::searchLess(T &val, rbtree::node *&n) {
+    if (n->val < val)
+        return n;
+    if (n->l != leaf)
+        return searchLess(val, n->l);
+    if (n->r != leaf)
+        return searchLess(val, n->r);
+    return nullptr;
 }
 
 template<typename T>
@@ -214,6 +308,7 @@ typename rbtree<T>::node* rbtree<T>::search(T &val, rbtree::node *&n)
         search(val, n->l);
     else if (val > n->val)
         search(val, n->r);
+    return nullptr;
 }
 
 template<typename T>
@@ -222,7 +317,7 @@ T rbtree<T>::max() { return max(root)->val; }
 template<typename T>
 typename rbtree<T>::node *rbtree<T>::max(node *mn)
 {
-    while (mn->r != nullptr)
+    while (mn->r != leaf)
         mn = mn->r;
     return mn;
 }
@@ -233,18 +328,24 @@ T rbtree<T>::min() { return min(root)->val; }
 template<typename T>
 typename rbtree<T>::node *rbtree<T>::min(node *mn)
 {
-    while (mn->l != nullptr)
+    while (mn->l != leaf)
         mn = mn->l;
     return mn;
 }
 
 template<typename T>
-void rbtree<T>::print(std::ostream &ost) { print("", root, false, ost); }
+void rbtree<T>::print(std::ostream &ost)
+{
+    if (!size)
+        ost << "> tree is empty\n";
+    else
+        print("", root, false, ost);
+}
 
 template<typename T>
 void rbtree<T>::print(const std::string& prefix, const node* n, bool isLeft, std::ostream &ost)
 {
-    if( n != nullptr )
+    if(n != leaf)
     {
         ost << prefix;
 
@@ -253,7 +354,7 @@ void rbtree<T>::print(const std::string& prefix, const node* n, bool isLeft, std
         else
             ost << (isLeft ? "├── " : "└── " );
 
-        std::cout << (n->c == RED ? "(": "[") << n->val << (n->c == RED ? ")": "]") << std::endl;
+        std::cout << (n->c == color::RED ? "r" : "b") << "[" << n->val << "]" << std::endl;
 
         print( prefix + (isLeft ? "│   " : "    "), n->l, true, ost);
         print( prefix + (isLeft ? "│   " : "    "), n->r, false, ost);
@@ -263,10 +364,10 @@ void rbtree<T>::print(const std::string& prefix, const node* n, bool isLeft, std
 template<typename T>
 void rbtree<T>::leftRotate(node *&n)
 {
-    node *nr = n->r;
+    auto nr = n->r;
     n->r = nr->l;
 
-    if (n->r != nullptr)
+    if (n->r != leaf)
         n->r->p = n;
     nr->p = n->p;
 
@@ -284,22 +385,22 @@ void rbtree<T>::leftRotate(node *&n)
 template<typename T>
 void rbtree<T>::rightRotate(node *&n)
 {
-    auto nr = n->l;
-    n->l = nr->r;
+    auto nl = n->l;
+    n->l = nl->r;
 
-    if (n->l != nullptr)
+    if (n->l != leaf)
         n->l->p = n;
-    nr->p = n->p;
+    nl->p = n->p;
 
     if (n->p == nullptr)
-        root = nr;
+        root = nl;
     else if (n == n->p->l)
-        n->p->l = nr;
+        n->p->l = nl;
     else
-        n->p->r = nr;
+        n->p->r = nl;
 
-    nr->r = n;
-    n->p = nr;
+    nl->r = n;
+    n->p = nl;
 }
 
 template class rbtree<int8_t>;
