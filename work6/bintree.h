@@ -21,7 +21,7 @@ class bintree {
     node *search(T &, node *&);
     node *min(node *);
     node *max(node *);
-    void print(const std::string& prefix, const node* n, bool isLeft, std::ostream &ost);
+    void print(const std::string &, const node *n, bool isLeft, std::ostream &);
     uint64_t size;
 
 
@@ -29,7 +29,7 @@ public:
     bintree();
     ~bintree();
     void add(T);
-    void print(std::ostream &ost);
+    void print(std::ostream &);
     void removeLess(double);
     bool remove(T);
     bool search(T);

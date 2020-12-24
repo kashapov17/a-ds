@@ -12,7 +12,6 @@ template<typename T>
 bintree<T>::~bintree()
 {
     destroy(root);
-    //delete root;
     root = nullptr;
 }
 
@@ -156,10 +155,10 @@ void bintree<T>::print(const std::string& prefix, const node* n, bool isLeft, st
             ost << (isLeft ? "├── " : "└── " );
 
         // print the value of the node
-        std::cout << "{" << n->val << "}" << std::endl;
+        ost << "{" << n->val << "}" << std::endl;
 
         // enter the next tree level - left and right branch
-        print( prefix + (isLeft ? "│   " : "    "), n->l, true, ost);
+        print( prefix + (isLeft ? "│   " : "    "), n->l, true,  ost);
         print( prefix + (isLeft ? "│   " : "    "), n->r, false, ost);
     }
 }
