@@ -136,7 +136,7 @@ typename rbtree<T>::node *rbtree<T>::remove(T &val, rbtree::node *&n)
         ret = remove(val, n->r);
     else
     {
-        auto old_n = n;
+        auto old_n = &*n;
         node x {.val=n->val, .c=n->c, .p=n->p, .l=n->l, .r=n->r};
         auto original_color = old_n->c;
         if(n->l == leaf)
@@ -150,11 +150,13 @@ typename rbtree<T>::node *rbtree<T>::remove(T &val, rbtree::node *&n)
         else if (n->r == leaf)
         {
             n = n->l;
-            if (n != leaf) {
+            if (n != leaf)
+            {
                 n->p = old_n->p;
             }
             delete old_n;
             size--;
+
         }
         else
         {
@@ -183,7 +185,6 @@ void rbtree<T>::fix_removing(rbtree::node *n)
                 leftRotate(n->p);
                 s = n->p->r;
             }
-
             if (s->l->c == BLACK and s->r->c == BLACK)
             {
                 s->c = RED;
@@ -193,12 +194,10 @@ void rbtree<T>::fix_removing(rbtree::node *n)
                 {
                     if (s->r->c == BLACK)
                     {
-                        s->l->c = BLACK;
-                        s->c = RED;
+                        std::swap(s->c, s->l->c);
                         rightRotate(s);
                         s = n->p->r;
                     }
-
                     s->c = n->p->c;
                     n->p->c = BLACK;
                     s->r->c = BLACK;
@@ -211,12 +210,10 @@ void rbtree<T>::fix_removing(rbtree::node *n)
                 auto s = n->p->l;
                 if (s->c == RED)
                 {
-                    s->c = BLACK;
-                    n->p->c = RED;
+                    std::swap(s->c, n->p->c);
                     rightRotate(n->p);
                     s = n->p->l;
                 }
-
                 if (s->r->c == BLACK && s->l->c == BLACK)
                 {
                     s->c = RED;
@@ -226,8 +223,7 @@ void rbtree<T>::fix_removing(rbtree::node *n)
                     {
                         if (s->l->c == BLACK)
                         {
-                            s->r->c = BLACK;
-                            s->c = RED;
+                            std::swap(s->c, s->r->c);
                             leftRotate(s);
                             s = n->p->l;
                         }
@@ -264,28 +260,27 @@ void rbtree<T>::destroy(node *&n)
 }
 
 template<typename T>
-void rbtree<T>::removeLess(T val)
+void rbtree<T>::removeLess(double val)
 {
     removeLess(val, root);
 }
 
 template<typename T>
-void rbtree<T>::removeLess(T &val, rbtree::node *&n)
+void rbtree<T>::removeLess(double &val, rbtree::node *&n)
 {
     auto x = searchLess(val, root);
-    do
-        {
-            if(x == leaf)
-                continue;
-            remove(x->val, x);
-            x = searchLess(val, root);
-        }
-        while (x);
+    while (x)
+    {
+        if(x == leaf)
+            continue;
+        remove(x->val);
+        x = searchLess(val, root);
+    }
 }
 
-
 template<typename T>
-typename rbtree<T>::node *rbtree<T>::searchLess(T &val, rbtree::node *&n) {
+typename rbtree<T>::node *rbtree<T>::searchLess(double &val, rbtree::node *&n)
+{
     if (n->val < val)
         return n;
     if (n->l != leaf)
@@ -352,7 +347,7 @@ void rbtree<T>::print(const std::string& prefix, const node* n, bool isLeft, std
         if (n==root)
             ost << "> ";
         else
-            ost << (isLeft ? "├── " : "└── " );
+            ost << (isLeft && n->p->r != leaf ? "├── " : "└── " );
 
         std::cout << (n->c == color::RED ? "r" : "b") << "[" << n->val << "]" << std::endl;
 

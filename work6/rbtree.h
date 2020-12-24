@@ -25,9 +25,9 @@ class rbtree {
     void color_flip(node *&);
     node *add(T &, node *&);
     node *remove(T &, node *&);
-    void removeLess(T &, node *&);
+    void removeLess(double &, node *&);
     node *search(T &, node *&);
-    node *searchLess(T &, node *&);
+    node *searchLess(double &, node *&);
     node *min(node *);
     node *max(node *);
     void print(const std::string& prefix, const node* n, bool isLeft, std::ostream &ost);
@@ -39,7 +39,7 @@ public:
     ~rbtree();
     void add(T);
     void print(std::ostream &ost);
-    void removeLess(T);
+    void removeLess(double);
     bool remove(T);
     bool search(T);
     T min();
