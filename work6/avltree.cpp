@@ -62,23 +62,27 @@ typename avltree<T>::node *avltree<T>::fix_addition(avltree::node *&n)
 template<typename T>
 bool avltree<T>::remove(T val)
 {
-    return static_cast<bool>(remove(val, root));
+    root = remove(val, root);
 }
 
 template<typename T>
 typename avltree<T>::node *avltree<T>::remove(T &val, avltree::node *&n)
 {
-    auto ret = n;
     if (n == nullptr)
         return nullptr;
     if (val < n->val)
-        ret = remove(val, n->l);
-    else if (val > n->val)
-        ret = remove(val, n->r);
-    else
     {
+        remove(val, n->l);
+        n->h = ch(n);
+    }
+    else if (val > n->val)
+    {
+        remove(val, n->r);
+        n->h = ch(n);
+    }
+    else {
         auto old_n = n;
-        if(n->l == nullptr)
+        if (n->l == nullptr)
         {
             n = n->r;
             delete old_n;
@@ -89,15 +93,40 @@ typename avltree<T>::node *avltree<T>::remove(T &val, avltree::node *&n)
             n = n->l;
             delete old_n;
             size--;
-        }
-        else
-        {
-            auto min_n = min(n->r);
-            n->val = min_n->val;
-            remove(min_n->val, n->r);
-        }
+        } else
+            {
+                auto min_n = min(n->r);
+                n->val = min_n->val;
+                remove(min_n->val, n->r);
+            }
     }
-    return ret;
+    n = fix_removing(n);
+    return n;
+}
+
+template<typename T>
+typename avltree<T>::node *avltree<T>::fix_removing(avltree::node *&n)
+{
+    if (n == nullptr) return n;
+    if(bf(n)==2 && bf(n->l)==1)
+        return rightRotate(n);
+    else if(bf(n)==2 && bf(n->l)==0)
+        return rightRotate(n);
+    else if(bf(n)==-2 && bf(n->r)==-1)
+        return leftRotate(n);
+    else if(bf(n)==-2 && bf(n->r)==0)
+        return leftRotate(n);
+    else if(bf(n)==2 && bf(n->l)==-1)
+    {
+        n->l = leftRotate(n->l);
+        return rightRotate(n);
+    }
+    else if(bf(n)==-2 && bf(n->r)==1)
+    {
+        n->r = rightRotate(n->r);
+        return leftRotate(n);
+    }
+    return n;
 }
 
 template<typename T>
@@ -106,14 +135,31 @@ inline typename avltree<T>::node* avltree<T>::node_alloc(T &val)
     node *n = new node;
     n->val = val;
     n->l = n->r = nullptr;
-    n->h = 0;
+    n->h = 1;
     return n;
 }
 
 template<typename T>
 void avltree<T>::removeLess(double val)
 {
-    removeLess(val, root);
+    auto x = searchLess(val, root);
+    while (x)
+    {
+        remove(x->val);
+        x = searchLess(val, root);
+    }
+}
+
+template<typename T>
+typename avltree<T>::node *avltree<T>::searchLess(double &val, avltree::node *&n)
+{
+    if (n->val < val)
+        return n;
+    if (n->l != nullptr)
+        return searchLess(val, n->l);
+    if (n->r != nullptr)
+        return searchLess(val, n->r);
+    return nullptr;
 }
 
 template<typename T>
@@ -169,27 +215,6 @@ typename avltree<T>::node *avltree<T>::min(node *mn)
 
 template<typename T>
 void avltree<T>::print(std::ostream &ost) { print("", root, false, ost); }
-
-template<typename T>
-void avltree<T>::print(const std::string& prefix, const node* n, bool isLeft, std::ostream &ost)
-{
-    if( n != nullptr )
-    {
-        ost << prefix;
-
-        if (n==root)
-            ost << "> ";
-        else
-            ost << (isLeft ? "├── " : "└── " );
-
-        // print the value of the node
-        std::cout << n->h << "[" << n->val << "]" << std::endl;
-
-        // enter the next tree level - left and right branch
-        print( prefix + (isLeft ? "│   " : "    "), n->l, true, ost);
-        print( prefix + (isLeft ? "│   " : "    "), n->r, false, ost);
-    }
-}
 
 template<typename T>
 void avltree<T>::destroy(node *&n)
@@ -259,7 +284,28 @@ int avltree<T>::ch(avltree::node *&n)
         return n->l->h + 1;
     else if(n->l == nullptr && n->r != nullptr)
         return n->r->h + 1;
-    return 0;
+    return 1;
+}
+
+template<typename T>
+void avltree<T>::print(const std::string& prefix, const node* n, bool isLeft, std::ostream &ost)
+{
+    if( n != nullptr )
+    {
+        ost << prefix;
+
+        if (n==root)
+            ost << "> ";
+        else
+            ost << (isLeft ? "├── " : "└── " );
+
+        // print the value of the node
+        std::cout << n->h << "[" << n->val << "]" << std::endl;
+
+        // enter the next tree level - left and right branch
+        print( prefix + (isLeft ? "│   " : "    "), n->l, true, ost);
+        print( prefix + (isLeft ? "│   " : "    "), n->r, false, ost);
+    }
 }
 
 template class avltree<int8_t>;

@@ -20,8 +20,9 @@ class avltree {
     node *add(T &, node *&);
     node *remove(T &, node *&);
     node *fix_addition(node *&);
-    void fix_removing(node *);
+    node *fix_removing(node *&);
     void removeLess(double &, node *&);
+    node *searchLess(double &, node *&);
     int bf(node *&);
     int ch(node *&);
     node *leftRotate(node *&);
