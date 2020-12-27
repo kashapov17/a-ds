@@ -136,7 +136,7 @@ typename rbtree<T>::node *rbtree<T>::remove(T &val, rbtree::node *&n)
         ret = remove(val, n->r);
     else
     {
-        auto old_n = &*n;
+        auto old_n = n;
         node x {.val=n->val, .c=n->c, .p=n->p, .l=n->l, .r=n->r};
         auto original_color = old_n->c;
         if(n->l == leaf)
@@ -151,9 +151,7 @@ typename rbtree<T>::node *rbtree<T>::remove(T &val, rbtree::node *&n)
         {
             n = n->l;
             if (n != leaf)
-            {
                 n->p = old_n->p;
-            }
             delete old_n;
             size--;
 
@@ -271,8 +269,6 @@ void rbtree<T>::removeLess(double &val, rbtree::node *&n)
     auto x = searchLess(val, root);
     while (x)
     {
-        if(x == leaf)
-            continue;
         remove(x->val);
         x = searchLess(val, root);
     }
@@ -310,7 +306,7 @@ template<typename T>
 T rbtree<T>::max() { return max(root)->val; }
 
 template<typename T>
-typename rbtree<T>::node *rbtree<T>::max(node *mn)
+typename rbtree<T>::node *rbtree<T>::max(rbtree::node *mn)
 {
     while (mn->r != leaf)
         mn = mn->r;
@@ -321,7 +317,7 @@ template<typename T>
 T rbtree<T>::min() { return min(root)->val; }
 
 template<typename T>
-typename rbtree<T>::node *rbtree<T>::min(node *mn)
+typename rbtree<T>::node *rbtree<T>::min(rbtree::node *mn)
 {
     while (mn->l != leaf)
         mn = mn->l;
@@ -357,7 +353,7 @@ void rbtree<T>::print(const std::string& prefix, const node* n, bool isLeft, std
 }
 
 template<typename T>
-void rbtree<T>::leftRotate(node *&n)
+void rbtree<T>::leftRotate(rbtree::node *&n)
 {
     auto nr = n->r;
     n->r = nr->l;
@@ -378,7 +374,7 @@ void rbtree<T>::leftRotate(node *&n)
 }
 
 template<typename T>
-void rbtree<T>::rightRotate(node *&n)
+void rbtree<T>::rightRotate(rbtree::node *&n)
 {
     auto nl = n->l;
     n->l = nl->r;
